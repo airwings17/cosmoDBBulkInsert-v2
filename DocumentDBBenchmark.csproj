@@ -61,11 +61,8 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="KeyValue.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
-    <None Include="Player.json">
+    <None Include="sensorData.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -35,11 +35,11 @@ namespace DocumentDBBenchmark
                 MaxRetryAttemptsOnThrottledRequests = 10,
                 MaxRetryWaitTimeInSeconds = 60
             }
-        };
+        }; 
 
         private static readonly string InstanceId = Dns.GetHostEntry("LocalHost").HostName + Process.GetCurrentProcess().Id;
         private const int MinThreadPoolSize = 100;
-        private string[] partitionKeysCollection = new string[] { "Delhi", "jaipur", "Mathura", "Paris", "Austria" };
+        private string[] partitionKeysCollection = new string[] { "Building 10", "Building 20", "Building 30", "Building 40", "Building X" };
         private int pendingTaskCount;
         private long documentsInserted;
         private ConcurrentDictionary<int, double> requestUnitsConsumed = new ConcurrentDictionary<int, double>();
@@ -85,12 +85,18 @@ namespace DocumentDBBenchmark
 
             try
             {
+                ConnectionPolicy.PreferredLocations.Add(LocationNames.SouthIndia); // second preference
+                //ConnectionPolicy.PreferredLocations.Add("UAE North"); // first preference
+                //ConnectionPolicy.PreferredLocations.Add(LocationNames.EastUS); // second preference
+
+
+
                 using (var client = new DocumentClient(new Uri(endpoint), authKey, ConnectionPolicy))
                 {
                     var program = new Program(client);
                     program.RunAsync().Wait();
                     Console.WriteLine("DocumentDBBenchmark completed successfully.");
-
+                    
                     //Console.Write("Reading data");
                     //var resu = await  program.ReadDBList(client);
                 }
@@ -108,7 +114,7 @@ namespace DocumentDBBenchmark
             var readtasks = new List<Task>();
 
 
-            for (var i = 0; i < 2000; i++)
+            for (var i = 0; i < 1; i++)
             {
                 readtasks.Add(this.ReadDB(client));
             }
@@ -121,13 +127,17 @@ namespace DocumentDBBenchmark
         {
            await  Task.Run(async () =>
             {
+                Stopwatch stopwatch = new Stopwatch();
+
+                stopwatch.Start();
+              
 
                 Console.WriteLine("\r\n>>>>>>>>>>>> Querying Document <<<<<<<<<<<<<<<<<<<<");
                 System.Random random = new System.Random();
-                string RandomCity = partitionKeysCollection[random.Next(partitionKeysCollection.Length-1)];
+                string RandomCity = partitionKeysCollection[random.Next(0, partitionKeysCollection.Length-1)];
 
                 // Console.ReadKey();
-                string Query = "select  * from c where c.auto ='" + RandomCity + "'";
+                string Query = "select  top 1 * from c where c.location ='" + RandomCity + "'";
                 var documentQuery = client.CreateDocumentQuery(UriFactory.CreateDocumentCollectionUri(DatabaseName, DataCollectionName), Query).AsDocumentQuery();
                 Console.WriteLine("Query : " + Query);
                 double totalRU = 0;
@@ -135,11 +145,13 @@ namespace DocumentDBBenchmark
                 while (documentQuery.HasMoreResults)
                 {
                     var queryResult = await documentQuery.ExecuteNextAsync();
+                    //IReadOnlyDictionary<string, QueryMetrics> metrics = queryResult.QueryMetrics;
                     totalRU += queryResult.RequestCharge;
                     allDocuments.AddRange(queryResult.ToList());
                     Console.WriteLine("Total result found in this batch" + queryResult.ToList().Count() + " with first doc ID:" + queryResult.ToList().First().id);
                 }
-                Console.WriteLine("Total RUs consumed " + totalRU);
+                stopwatch.Stop();
+                Console.WriteLine("Total RUs consumed " + totalRU + " time consumed : " + stopwatch.ElapsedMilliseconds.ToString()) ;
             });
         }
 
@@ -220,12 +232,13 @@ namespace DocumentDBBenchmark
             string partitionKeyProperty = collection.PartitionKey.Paths[0].Replace("/", "");
             Dictionary<string, object> newDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(sampleJson);
 
+        
+
             for (var i = 0; i < numberOfDocumentsToInsert; i++)
             {
                 System.Random random = new System.Random();
                 newDictionary["id"] = Guid.NewGuid().ToString();
-                newDictionary[partitionKeyProperty] = partitionKeysCollection[random.Next(0, partitionKeysCollection.Count() - 1)]; // newDictionary["batch"];
-                newDictionary["nickname"] = "HARSH" + Guid.NewGuid().ToString();
+                newDictionary[partitionKeyProperty] = partitionKeysCollection[random.Next(0, partitionKeysCollection.Count() - 1)]; 
 
                 try
                 {
@@ -234,6 +247,26 @@ namespace DocumentDBBenchmark
                     string partition = response.SessionToken.Split(':')[0];
                     requestUnitsConsumed[taskId] += response.RequestCharge;
                     Interlocked.Increment(ref this.documentsInserted);
+
+
+                    // Trying to read value from session
+
+                    //string sessionToken;
+                    //string docSelfLink;
+
+                    //sessionToken = response.SessionToken;
+                    //Document created = response.Resource;
+                    //docSelfLink = created.SelfLink;
+
+                    //string endpoint = ConfigurationManager.AppSettings["EndPointUrl"];
+                    //string authKey = ConfigurationManager.AppSettings["AuthorizationKey"];
+
+                    //using (DocumentClient client1 = new DocumentClient(new Uri(endpoint), authKey, ConnectionPolicy))
+                    //{
+                    //    ResourceResponse<Document> read = client1.ReadDocumentAsync(docSelfLink, new RequestOptions { SessionToken = "0:1201947", PartitionKey = new PartitionKey("location") }).Result;
+                    //}
+                    //string str = "test";
+
                 }
                 catch (Exception e)
                 {

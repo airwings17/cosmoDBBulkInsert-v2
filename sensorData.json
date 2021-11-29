@@ -1,0 +1,17 @@
+﻿{
+  "type": "sensorData",
+  "customer": "DroneZone",
+  "country": "US",
+  "state": "New York",
+  "Sensor": "S2021-AIO-5",
+  "location": "Building 10",
+  "room": "101",
+  "DateTime": "15-Nov-2021 10:00:00 AM",
+  "data": {
+    "temp-in-celcius": "20",
+    "Smoke": "250",
+    "isOccupied": false,
+    "PM2.5": "80",
+    "PM10": "100"
+  }
+}
