@@ -1,21 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Configuration;
+using System.Diagnostics;
+using System.Net;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
+using Microsoft.Azure.Documents.Linq;
+
 namespace DocumentDBBenchmark
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Concurrent;
-    using System.Configuration;
-    using System.Diagnostics;
-    using System.Net;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Azure.Documents;
-    using Microsoft.Azure.Cosmos;
-    using Microsoft.Azure.Documents.Client;
-    using Newtonsoft.Json;
-    using Microsoft.Azure.Documents.Linq;
-
     /// <summary>
     /// This sample demonstrates how to achieve high performance writes using DocumentDB.
     /// </summary>
