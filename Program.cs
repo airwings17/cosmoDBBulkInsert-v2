@@ -86,9 +86,10 @@ namespace DocumentDBBenchmark
 
             try
             {
-                ConnectionPolicy.PreferredLocations.Add(LocationNames.EastAsia); // second preference
-                                                                                 //ConnectionPolicy.PreferredLocations.Add("UAE North"); // first preference
-                                                                                 //ConnectionPolicy.PreferredLocations.Add(LocationNames.EastUS); // second preference
+                #region Commented Code
+                //ConnectionPolicy.PreferredLocations.Add(LocationNames.EastAsia); // first preference
+                //ConnectionPolicy.PreferredLocations.Add("UAE North"); // second preference
+                //ConnectionPolicy.PreferredLocations.Add(LocationNames.EastUS); // third preference
 
 
 
@@ -98,21 +99,21 @@ namespace DocumentDBBenchmark
                 //    {
                 //        IgnoreNullValues = true
                 //    },
-                //    ConnectionMode = ConnectionMode.Gateway,
+                //    ConnectionMode = ConnectionMode.Gateway,//Or Direct
                 //};
+                #endregion
 
                 using (var client = new DocumentClient(new Uri(endpoint), authKey, ConnectionPolicy))
                 {
                     var program = new Program(client);
 
-                   // program.WriteAsync().Wait();
-                   // Console.WriteLine("DocumentDBBenchmark completed successfully.");
+                    //Console.Write("Writing data");
+                    // program.WriteAsync().Wait();
+                    // Console.WriteLine("DocumentDBBenchmark completed successfully.");
 
 
                     Console.Write("Reading data");
                     var resu = await program.ReadDBList(client);
-
-
                 }
             }
 
@@ -127,8 +128,9 @@ namespace DocumentDBBenchmark
         {
             var readtasks = new List<Task>();
 
-
-            for (var i = 0; i < 100; i++)
+            //
+            int loopCount = Convert.ToInt32( ConfigurationManager.AppSettings["ReadLoopCount"].ToString());
+            for (var i = 0; i < loopCount; i++)
             {
                 readtasks.Add(this.ReadDB(client));
             }
