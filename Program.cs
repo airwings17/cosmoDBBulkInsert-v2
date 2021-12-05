@@ -106,13 +106,13 @@ namespace DocumentDBBenchmark
                 {
                     var program = new Program(client);
 
-                    //Console.Write("Writing data");
-                    // program.WriteAsync().Wait();
-                    // Console.WriteLine("DocumentDBBenchmark completed successfully.");
+                    Console.Write("Writing data");
+                    program.WriteAsync().Wait();
+                    Console.WriteLine("DocumentDBBenchmark completed successfully.");
 
 
-                    Console.Write("Reading data");
-                    var resu = await program.ReadDBList(client);
+                    //Console.Write("Reading data");
+                    //var resu = await program.ReadDBList(client);
                 }
             }
 
