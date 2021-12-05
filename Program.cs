@@ -263,7 +263,7 @@ namespace DocumentDBBenchmark
                 string randombuilding = "Building " + random.Next(1, 40);
                 newDictionary["location"] = randombuilding;  //partitionKeysCollection[random.Next(0, partitionKeysCollection.Count() - 1)];
 
-                string randomSensor = "S2021-AIO-" + random.Next(1, 5);
+                string randomSensor = "S2021-AIO-" + random.Next(1, 6);
                 newDictionary["Sensor"] = randomSensor;
 
                 string randomRoom = "10" + random.Next(1, 9);
